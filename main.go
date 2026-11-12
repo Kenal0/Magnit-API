@@ -1,11 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"bufio"
 	"net/http"
 	"os"
 	"time"
@@ -27,7 +27,7 @@ type Pagination struct {
 }
 
 type Sort struct {
-    Order string
+	Order string
 	Type  string
 }
 
@@ -91,11 +91,11 @@ func main() {
 
 	fmt.Println("Status:", resp.Status)
 
-    var prettyJSON bytes.Buffer
-    err = json.Indent(&prettyJSON, body, "", " ")
-    if err != nil {
-        panic(err)
-    }
+	var prettyJSON bytes.Buffer
+	err = json.Indent(&prettyJSON, body, "", " ")
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Println(prettyJSON.String())
 }

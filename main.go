@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"bufio"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -34,6 +36,15 @@ func main() {
 		Timeout: 15 * time.Second,
 	}
 
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("What goods you are looking for?")
+
+	search, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Error reading input: ", err)
+		return
+	}
+
 	payload := SearchRequest{
 		IncludeAdultGoods: true,
 		Pagination: Pagination{
@@ -44,7 +55,7 @@ func main() {
 			Order: "desc",
 			Type:  "popularity",
 		},
-		Term:        "индейка",
+		Term:        search,
 		StoreCode:   "992301",
 		StoreType:   "dostavka",
 		CatalogType: "3",

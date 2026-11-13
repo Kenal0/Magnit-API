@@ -5,11 +5,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
+
+type SearchResponse struct {
+	Items []Item `json:"items"`
+}
+
+type Item struct {
+	Name string `json:"name"`
+	Price int   `json:"price"`
+}
 
 type SearchRequest struct {
 	IncludeAdultGoods bool       `json:"includeAdultGoods"`
@@ -22,13 +31,13 @@ type SearchRequest struct {
 }
 
 type Pagination struct {
-	Limit  int
-	Offset int
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
 }
 
 type Sort struct {
-	Order string
-	Type  string
+	Order string `json:"order"`
+	Type  string `json:"type"`
 }
 
 func main() {
@@ -44,6 +53,8 @@ func main() {
 		fmt.Println("Error reading input: ", err)
 		return
 	}
+
+	search = strings.TrimSpace(search)
 
 	payload := SearchRequest{
 		IncludeAdultGoods: true,
@@ -84,18 +95,16 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
 	fmt.Println("Status:", resp.Status)
 
-	var prettyJSON bytes.Buffer
-	err = json.Indent(&prettyJSON, body, "", " ")
+	var result SearchResponse
+
+	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(prettyJSON.String())
+	for _, item := range result.Items {
+		fmt.Println(item.Name, item.Price)
+	}
 }
